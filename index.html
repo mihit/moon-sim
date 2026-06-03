@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+    <title>月の満ち欠けシミュレーター</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="stage" aria-label="月の満ち欠けシミュレーター">
+        <div class="topbar">
+          <div>
+            <h1>月の満ち欠けシミュレーター</h1>
+            <p>地球・月・太陽・観測者の関係を、同じ盤面で動かして確かめる。</p>
+          </div>
+          <div class="phase-badge">
+            <span id="phaseName">上弦</span>
+            <strong id="moonAge">月齢 7.4</strong>
+          </div>
+        </div>
+
+        <div class="sim-grid">
+          <div class="orbit-panel">
+            <canvas id="orbitCanvas" width="920" height="720" aria-label="地球と月と太陽の俯瞰図"></canvas>
+          </div>
+
+          <aside class="control-panel" aria-label="操作パネル">
+            <div class="readout">
+              <div>
+                <span>観測時刻</span>
+                <strong id="timeReadout">18:00</strong>
+              </div>
+              <div>
+                <span>月の方角</span>
+                <strong id="azimuthReadout">南</strong>
+              </div>
+              <div>
+                <span>見える高さ</span>
+                <strong id="altitudeReadout">高い</strong>
+              </div>
+            </div>
+
+            <div class="moon-view">
+              <canvas id="moonCanvas" width="240" height="240" aria-label="観測者から見た月の形"></canvas>
+              <div class="moon-caption">
+                <strong id="visibilityReadout">夕方に南の空</strong>
+                <span id="phaseHint">右半分が光って見える。</span>
+              </div>
+            </div>
+
+            <label class="control">
+              <span>基準の月の位置</span>
+              <input id="moonAngle" type="range" min="0" max="360" value="90">
+            </label>
+
+            <div class="quick-row" aria-label="代表的な月相">
+              <button type="button" data-angle="0">新月</button>
+              <button type="button" data-angle="90">上弦</button>
+              <button type="button" data-angle="180">満月</button>
+              <button type="button" data-angle="270">下弦</button>
+            </div>
+
+            <label class="control">
+              <span>観測時刻</span>
+              <input id="timeOfDay" type="range" min="0" max="24" step="0.25" value="18">
+            </label>
+
+            <label class="control">
+              <span>立っている場所</span>
+              <input id="observerLongitude" type="range" min="-180" max="180" value="0">
+            </label>
+
+            <label class="control">
+              <span>太陽の向き</span>
+              <input id="sunAngle" type="range" min="-180" max="180" value="0">
+            </label>
+
+            <label class="toggle">
+              <input id="lockSun" type="checkbox" checked>
+              <span>太陽を右側に固定</span>
+            </label>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
