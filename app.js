@@ -200,6 +200,49 @@ function drawMoonDisc(ctx, x, y, radius, separation, sunFromRight = true) {
   ctx.stroke();
 }
 
+function drawOrbitMoonDisc(ctx, x, y, radius, lightDirection) {
+  const size = Math.ceil(radius * 2);
+  const moonImage = ctx.createImageData(size, size);
+  const length = Math.hypot(lightDirection.x, lightDirection.y) || 1;
+  const lightX = lightDirection.x / length;
+  const lightY = lightDirection.y / length;
+
+  for (let py = 0; py < size; py += 1) {
+    for (let px = 0; px < size; px += 1) {
+      const nx = (px + 0.5 - radius) / radius;
+      const ny = (py + 0.5 - radius) / radius;
+      const dist = Math.hypot(nx, ny);
+      if (dist > 1) continue;
+
+      const facingSun = nx * lightX + ny * lightY;
+      const lightAmount = Math.max(0, facingSun);
+      const rim = 1 - dist * 0.2;
+      const base = lightAmount > 0 ? [245, 241, 223] : [18, 21, 25];
+      const shade = lightAmount > 0 ? (0.38 + lightAmount * 0.68) * rim : 0.52;
+      const edgeAlpha = Math.min(1, Math.max(0, (1 - dist) * 18));
+      const idx = (py * size + px) * 4;
+      moonImage.data[idx] = Math.round(base[0] * shade);
+      moonImage.data[idx + 1] = Math.round(base[1] * shade);
+      moonImage.data[idx + 2] = Math.round(base[2] * shade);
+      moonImage.data[idx + 3] = Math.round(255 * edgeAlpha);
+    }
+  }
+
+  ctx.save();
+  const bitmapCanvas = document.createElement("canvas");
+  bitmapCanvas.width = size;
+  bitmapCanvas.height = size;
+  bitmapCanvas.getContext("2d").putImageData(moonImage, 0, 0);
+  ctx.drawImage(bitmapCanvas, x - radius, y - radius, size, size);
+  ctx.restore();
+
+  ctx.strokeStyle = "rgba(255,255,255,0.35)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, TAU);
+  ctx.stroke();
+}
+
 function drawEarth(ctx, cx, cy, radius, sunAngle, rotationAngle) {
   ctx.save();
   ctx.beginPath();
@@ -333,7 +376,10 @@ function drawOrbit(state) {
   orbitCtx.stroke();
   orbitCtx.setLineDash([]);
 
-  drawMoonDisc(orbitCtx, moon.x, moon.y, moonRadius, moonSeparation, Math.cos(sunAngle * DEG) >= 0);
+  drawOrbitMoonDisc(orbitCtx, moon.x, moon.y, moonRadius, {
+    x: Math.cos(sunAngle * DEG),
+    y: -Math.sin(sunAngle * DEG),
+  });
 
   orbitCtx.fillStyle = "#f4f0e8";
   orbitCtx.font = "700 16px system-ui";
